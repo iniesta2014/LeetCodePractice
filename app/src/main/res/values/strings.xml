@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">LeetCodePractices</string>
+    <string name="finish_novice_video_task">
+        <![CDATA[
+            <font color = \'#FDA006\'>视频任务完成啦！</font><br>快去领取奖励吧~</br>
+        ]]>
+    </string>
+
+</resources>
