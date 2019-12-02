@@ -13,6 +13,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
+import java.util.Stack;
 
 public class LeetCodeActivity extends AppCompatActivity {
     @Override
@@ -454,7 +455,7 @@ public class LeetCodeActivity extends AppCompatActivity {
     }
 
     // 148. Sort List
-    // ****
+    // *****
     public ListNode sortList(ListNode head) {
         if (head == null || head.next == null) {
             return head;
@@ -495,7 +496,6 @@ public class LeetCodeActivity extends AppCompatActivity {
         return helper.next;
     }
 
-
     // 2. Add Two Numbers
     // ***
     public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
@@ -523,5 +523,102 @@ public class LeetCodeActivity extends AppCompatActivity {
         }
         return helper.next;
     }
+
+    public class TreeNode {
+      int val;
+      TreeNode left;
+      TreeNode right;
+      TreeNode(int x) { val = x; }
+    }
+
+
+    // 94. Binary Tree Inorder Traversal
+    // *****
+    public List<Integer> inorderTraversal(TreeNode root) {
+        Stack<TreeNode> stack = new Stack<>();
+        List<Integer> res = new ArrayList<>();
+        while (!stack.isEmpty() || root != null) {
+            if (root != null) {
+                stack.push(root);
+                root = root.left;
+            } else {
+                TreeNode node = stack.pop();
+                res.add(node.val);
+                root = node.right;
+            }
+        }
+        return res;
+    }
+
+    // 144. Binary Tree Preorder Traversal
+    // *****
+    public List<Integer> preorderTraversal(TreeNode root) {
+        Stack<TreeNode> stack = new Stack<>();
+        List<Integer> res = new ArrayList<>();
+        if (root == null) {
+            return res;
+        }
+        while (!stack.isEmpty() || root != null) {
+            if (root != null) {
+                stack.push(root);
+                res.add(root.val);
+                root = root.left;
+            } else {
+                TreeNode node = stack.pop();
+                root = node.right;
+            }
+        }
+        return res;
+    }
+
+    // 145. Binary Tree Postorder Traversal
+    //*****
+    public List<Integer> postorderTraversal(TreeNode root) {
+        Stack<TreeNode> stack = new Stack<>();
+        LinkedList<Integer> res = new LinkedList<>();
+        if (root == null) {
+            return res;
+        }
+        while (!stack.isEmpty() || root != null) {
+            if (root != null) {
+                stack.push(root);
+                res.addFirst(root.val);
+                root = root.right;
+            } else {
+                TreeNode node = stack.pop();
+                root = node.left;
+            }
+        }
+        return res;
+    }
+
+    // 102. Binary Tree Level Order Traversal
+    // ****关键是用队列存储一层
+    public List<List<Integer>> levelOrder(TreeNode root) {
+        List<List<Integer>> res = new ArrayList<>();
+        Queue<TreeNode> queue = new LinkedList<>();
+        if (root == null) {
+            return res;
+        }
+        queue.add(root);
+        while (!queue.isEmpty()) {
+            List<Integer> tmp = new ArrayList<>();
+            int size = queue.size();
+            for (int i = 0; i < size; i++) {
+                TreeNode node = queue.poll();
+                tmp.add(node.val);
+                if (node.left != null) {
+                    queue.offer(node.left);
+                }
+                if (node.right != null) {
+                    queue.offer(node.right);
+                }
+            }
+            res.add(tmp);
+        }
+        return res;
+    }
+
+    
     
 }
