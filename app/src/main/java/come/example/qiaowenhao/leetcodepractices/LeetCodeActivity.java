@@ -22,8 +22,9 @@ public class LeetCodeActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_leetcode);
-        int[] nums = {2,3,1,2,4,3};
-        Log.d("iniesta", "onCreate: " + minSubArrayLen(7,nums));
+        int[] nums = {2,5,6,0,0,1,2};
+        //nextPermutation(nums);
+        Log.d("iniesta", "onCreate: search " + search(nums, 3));
     }
 
     // 349. Intersection of Two Arrays
@@ -873,8 +874,379 @@ public class LeetCodeActivity extends AppCompatActivity {
         }
     }
 
-    
+    // 31. Next Permutation
+    // *****
+    public void nextPermutation(int[] nums) {
+        if (nums == null || nums.length == 0) {
+            return;
+        }
+        int pos = -1;
+        int length = nums.length;
+        // 找到最后一个升序位置
+        for (int i = length - 1; i >= 0; i--) {
+            if (i - 1 >= 0 && nums[i] > nums[i - 1]) {
+                pos = i -1;
+                break;
+            }
+        }
 
-    
+        // 不存在升序位置，说明这个数是最大的，反排
+        if (pos == -1) {
+            reverse(nums, 0, length - 1);
+            return;
+        }
 
+        // 找到pos之后最后比他大的位置，和pos交换
+        for (int i = length - 1; i > pos; i--) {
+            if (nums[i] > nums[pos]) {
+                swapNum(nums, i, pos);
+                break;
+            }
+        }
+
+        // 反转pos之后的数
+        reverse(nums, pos + 1, length - 1);
+    }
+
+    private void reverse(int[] nums, int start, int end) {
+        while (start < end) {
+            swapNum(nums, start, end);
+            start++;
+            end--;
+        }
+    }
+
+    private void swapNum(int[] nums, int start, int end) {
+        int tmp = nums[start];
+        nums[start] = nums[end];
+        nums[end] = tmp;
+    }
+
+    //  39. Combination Sum
+    // ****
+    public List<List<Integer>> combinationSum(int[] candidates, int target) {
+        List<List<Integer>> res = new ArrayList<>();
+        // 排序
+        Arrays.sort(candidates);
+        combinationSum(res, new ArrayList<Integer>(), candidates, target, 0);
+        return res;
+    }
+
+    private void combinationSum(List<List<Integer>> res, List<Integer> tmp, int[] candidates, int target, int cur) {
+        if (target < 0) {
+            return;
+        }
+
+        // 注意错误写法
+        //tmp.add(candidates[cur]);
+        if (target == 0) {
+            res.add(new ArrayList<Integer>(tmp));
+        }
+
+        // 遍历，每一步选哪一个都有可能
+        for (int i = cur; i < candidates.length; i++) {
+            tmp.add(candidates[i]);
+            combinationSum(res, tmp, candidates, target - candidates[i], i);
+            tmp.remove(tmp.size() - 1);
+        }
+    }
+
+    // 48. Rotate Image
+    // 图片顺时针旋转90
+    // **** 注意值传递的问题，不能直接交换两个元素,数组一定要注意下标越界的错误
+    public void rotate(int[][] matrix) {
+        int row = matrix.length;
+        int colum = matrix[0].length;
+
+        for (int i = 0; i < row / 2; i++) {
+            for (int j = 0; j < colum; j++) {
+                swap(matrix, i, j, row - i - 1, j);
+            }
+        }
+
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < i; j++) {
+                swap(matrix, i, j, j, i);
+            }
+        }
+
+    }
+
+    private void swap(int[][] matrix, int i, int j, int m, int k) {
+        int tmp = matrix[i][j];
+        matrix[i][j] = matrix[m][k];
+        matrix[m][k] = tmp;
+    }
+
+    // 54. Spiral Matrix m*n矩阵顺时针打印
+    // *****
+    // The only tricky part is that when I traverse left or up I have to check whether the row or
+    // col still exists to prevent duplicates
+    public List<Integer> spiralOrder(int[][] matrix) {
+        List<Integer> list = new ArrayList<>();
+        if (matrix == null) {
+            return list;
+        }
+        int top = 0, bottom = matrix.length - 1;
+        int start = 0, end = matrix[0].length - 1;
+        // 1.是&&
+        while (start <= end && top <= bottom) {
+            for (int i = start; i <= end; i++) {
+                list.add(matrix[top][i]);
+            }
+            top++;
+            for (int i = top; i <= bottom; i++) {
+                list.add(matrix[i][end]);
+            }
+            end--;
+
+            // 2.判断越界与否
+            if (top <= bottom) {
+                for (int i = end; i >= start; i--) {
+                    list.add(matrix[bottom][i]);
+                }
+                bottom--;
+            }
+
+            if (start <= end) {
+                for (int i = bottom; i <= top; i--) {
+                    list.add(matrix[i][start]);
+                }
+                start++;
+            }
+        }
+        return list;
+    }
+
+    // 34. Find First and Last Position of Element in Sorted Array
+    // 两次二分查找，第一次可能找不到
+    // ***** mid取值，真正理解二分法
+    public int[] searchRange(int[] nums, int target) {
+        int[] res = {-1, -1};
+        if (nums == null || nums.length == 0) {
+            return res;
+        }
+        // search for the left one
+        int start = 0;
+        int end = nums.length - 1;
+        while (start < end) {
+            int mid = (start + end) / 2;
+            if (nums[mid] >= target) {
+                end  = mid;
+            } else {
+                start = mid + 1;
+            }
+        }
+        if (nums[start] == target) {
+            res[0] = start;
+        } else {
+            return res;
+        }
+        // Search for the right one
+        // We don't have to set i to 0 the second time.
+        end = nums.length - 1;
+        while (start < end) {
+            int mid = (start + end) / 2 + 1;
+            if (nums[mid] <= target) {
+                start = mid;
+            } else {
+                end = mid - 1;
+            }
+        }
+        // both start and end is ok
+        res[1] = start;
+        return res;
+    }
+
+    // 55. Jump Game
+    // 最优解应该是贪心，这里先用动态规划，dp[i]表示到i剩余的跳数
+    // 贪心解法 https://www.cnblogs.com/grandyang/p/4371526.html
+    // ****
+    public boolean canJump(int[] nums) {
+        int length = nums.length;
+        int[] dp = new int[length];
+        for (int i = 1; i < length; i++) {
+            dp[i] = Math.max(dp[i - 1], nums[i - 1]) - 1;
+            if (dp[i] < 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    //  62. Unique Paths
+    // *** 空间复杂度需要优化
+    public int uniquePaths(int m, int n) {
+        int[][] dp = new int[m][n];
+        dp[0][0] = 1;
+        for (int i = 0; i < m; i++) {
+            dp[i][0] = 1;
+        }
+
+        for (int i = 1; i < n; i++) {
+            dp[0][i] = 1;
+        }
+
+        for (int i = 1; i < m; i++) {
+            for (int j = 1; j < n; j++) {
+                dp[i][j] = dp[i - 1][j] + dp[i][j - 1];
+            }
+        }
+        return dp[m - 1][n - 1];
+    }
+
+    // 63. Unique Paths II
+    // **** dp数组的初始化
+    public int uniquePathsWithObstacles(int[][] obstacleGrid) {
+        if (obstacleGrid == null || obstacleGrid.length == 0) {
+            return 0;
+        }
+
+        int m = obstacleGrid.length;
+        int n = obstacleGrid[0].length;
+
+        int[][] dp = new int[m][n];
+        for (int i = 0; i < n; i++) {
+            if (obstacleGrid[0][i] == 1) {
+                dp[0][i] = 0;
+                break;
+            } else {
+                dp[0][i] = 1;
+            }
+        }
+
+        for (int j = 0; j < m; j++) {
+            if (obstacleGrid[j][0] == 1) {
+                dp[j][0] = 0;
+                break;
+            } else {
+                dp[j][0] = 1;
+            }
+        }
+
+        for (int i = 1; i < m; i++) {
+            for (int j = 1; j < n; j++) {
+                if (obstacleGrid[i][j] == 1) {
+                    dp[i][j] = 0;
+                } else {
+                    dp[i][j] = dp[i - 1][j] + dp[i][j - 1];
+                }
+            }
+        }
+        return dp[m - 1][n - 1];
+    }
+
+    // 74. Search a 2D Matrix
+    // ***
+    public boolean searchMatrix(int[][] matrix, int target) {
+        if (matrix == null || matrix.length == 0 || matrix[0].length == 0) {
+            return false;
+        }
+        int m = matrix.length;
+        int n = matrix[0].length;
+        int start = 0;
+        int end = m * n - 1;
+        // 注意等号
+        while (start <= end) {
+            int mid = (start + end) / 2;
+            int cur = matrix[mid / n][mid % n];
+            if (cur == target) {
+                return true;
+            } else if (cur < target) {
+                start = mid + 1;
+            } else {
+                end = mid - 1;
+            }
+        }
+        return false;
+    }
+
+    // 78. Subsets
+    // *****
+    // 理解回溯算法 需要结合解空间理解一下
+    public List<List<Integer>> subsets(int[] nums) {
+        List<List<Integer>> res = new ArrayList<>();
+        if (nums == null || nums.length == 0) {
+            return res;
+        }
+        Arrays.sort(nums);
+        dfs(res, new ArrayList<Integer>(), nums, 0);
+        return res;
+    }
+
+    private void dfs(List<List<Integer>> res, List<Integer> tmp, int[] nums, int cur) {
+        res.add(new ArrayList<Integer>(tmp));
+        for (int i = cur; i < nums.length; i++) {
+            tmp.add(nums[i]);
+            dfs(res, tmp, nums, i + 1);
+            tmp.remove(tmp.size() - 1);
+        }
+    }
+
+    // 另一种解法
+    public List<List<Integer>> subsets1(int[] nums) {
+        List<List<Integer>> result = new ArrayList<List<Integer>>();
+        List<Integer> array = new ArrayList<Integer>();
+        result.add(array);
+        if(nums==null){
+            return result;
+        }
+        Arrays.sort(nums);
+        for(int i=1;i<=nums.length;i++){
+            array.clear();
+            dfs1(nums,0,i,array,result);
+        }
+        return result;
+    }
+    void dfs1(int []number_array,int start,int number,List<Integer> array,
+             List<List<Integer>> result) {
+        if(number==array.size()){
+            result.add(new ArrayList<Integer>(array)); //思考此处为何要新建一个数组？空数组是怎么得到的？
+            return;
+        }
+        for(int i=start;i<number_array.length;i++){
+            array.add(number_array[i]);
+            dfs1(number_array,i+1,number,array,result);
+            array.remove(array.size()-1);
+        }
+    }
+
+    //  81. Search in Rotated Sorted Array II
+    // 考察边界条件，如{1,3}
+    // ******
+    public boolean search(int[] nums, int target) {
+        if (nums == null || nums.length == 0) {
+            return false;
+        }
+        int start = 0;
+        int end = nums.length - 1;
+        while (start <= end) {
+            int mid = (start + end) / 2;
+            if (nums[mid] == target) {
+                return true;
+            }
+            // the only difference from the first one, trickly case, just updat left and right
+            if (nums[start] == nums[mid] && nums[end] == nums[mid]) {
+                start++;
+                end--;
+                // 左侧升序
+            } else if (nums[mid] >= nums[start]) {
+                if (nums[start] <= target && target < nums[mid]) {
+                    end = mid - 1;
+                } else {
+                    start = mid + 1;
+                }
+                // 右侧升序
+            } else {
+                if (target > nums[mid] && target <= nums[end]) {
+                    start = mid + 1;
+                } else {
+                    end = mid - 1;
+                }
+            }
+        }
+        return false;
+    }
+    
 }
+
