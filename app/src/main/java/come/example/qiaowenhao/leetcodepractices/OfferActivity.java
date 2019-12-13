@@ -813,7 +813,8 @@ public class OfferActivity extends AppCompatActivity {
         return queue.isEmpty() ? '#' : queue.peek();
     }
 
-
+    // 删除排序链表中重复结点
+    // ****
     public ListNode deleteDuplication(ListNode pHead)
     {
         ListNode helper = new ListNode(-1);
@@ -848,6 +849,12 @@ public class OfferActivity extends AppCompatActivity {
         }
     }
 
+
+    // 二叉树的下一个结点
+    // 给定一个二叉树和其中的一个结点，请找出中序遍历的下一个结点并返回
+    // 注意，树中的结点不仅包含左右子结点，同时包含指向父结点的指针
+    // 不明白经典在哪，记住吧
+    // *****
     public TreeLinkNode GetNext(TreeLinkNode pNode)
     {
         TreeLinkNode node = null;
@@ -869,6 +876,11 @@ public class OfferActivity extends AppCompatActivity {
         }
     }
 
+    //　矩阵中的路径
+    //  判断矩阵中是否存在一条包含某字符串所有字符的路径，路径可以从矩阵中任意一个格子开始，
+    //  每一步可以在矩阵中向左右上下移动一个格子，一条路径经过某个格子之后，该路径不能进入该格子
+    //  分治、回溯
+    // ****
     public boolean hasPath(char[] matrix, int rows, int cols, char[] str)
     {
         int[] flag = new int[matrix.length];
@@ -905,7 +917,11 @@ public class OfferActivity extends AppCompatActivity {
         return false;
     }
 
-
+    // 机器人的运动范围
+    // m *n的方格，机器人从(0,0)开始移动，每次只能向左右上下四个方向移动一格，但是不能进入行列坐标的数位之和大于k的格子
+    // 该机器人能到达多少个格子
+    // 典型分治算法，分解、解决、合并
+    // ****　
     public int movingCount(int threshold, int rows, int cols)
     {
         boolean[][] flag = new boolean[rows][cols];
@@ -932,6 +948,10 @@ public class OfferActivity extends AppCompatActivity {
         return res;
     }
 
+
+    // 减绳子　
+    // 一根长度为n的绳子，请把绳子减成整数长的m段，使得这m段的乘积最大
+    // ****
     public int cutRope(int target) {
         if (target == 2) {
             return 1;
@@ -957,7 +977,10 @@ public class OfferActivity extends AppCompatActivity {
     }
 
 
-
+    //　正则表达式匹配
+    // 表示任意一个字符，*表示它前面的字符可以出现任意次数（包括0）
+    // aaa与a.a匹配,和ab*ac*a匹配，和aa.a、ab*a均不匹配
+    // 典型的分治算法，分解、解决、合并，难点在子问题的分解
     public boolean match(char[] str, char[] pattern)
     {
         return helper(str, pattern, 0, 0);
@@ -975,7 +998,7 @@ public class OfferActivity extends AppCompatActivity {
 
         // 模式第二个字符是*
         if ((j + 1) < pattern.length && pattern[j + 1] == '*') {
-            // 模式第二个字符跟字符串第一个字符相匹配，分三种模式
+            // 模式第一个字符跟字符串第一个字符相匹配，分三种模式
             if (i < str.length && (str[i] == pattern[j] || pattern[j] == '.')) {
                 return helper(str, pattern, i, j + 2)//　模式后移2,视为x*匹配0个字符
                         || helper(str, pattern, i + 1, j + 2)//　模式匹配一个字符

@@ -7,10 +7,12 @@ import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.Stack;
@@ -53,10 +55,10 @@ public class LeetCodeActivity extends AppCompatActivity {
     }
 
     // 75. Sort Colors
-    // ****
+    // **** 双指针，理解双重循环
     public void sortColors(int[] nums) {
         int start = 0, end = nums.length - 1;
-        for (int i = 0; i <= end; i++) {
+        for (int i = start; i <= end; i++) {
             while (nums[i] == 2 && i < end) {
                 swap(nums, i, end--);
             }
@@ -253,6 +255,7 @@ public class LeetCodeActivity extends AppCompatActivity {
 
     // 142. Linked List Cycle II
     // ***
+    //分析　https://blog.csdn.net/sinat_35261315/article/details/79205157
     public ListNode detectCycle(ListNode head) {
         ListNode slow = head;
         ListNode fast = head;
@@ -275,7 +278,7 @@ public class LeetCodeActivity extends AppCompatActivity {
         return head;
     }
 
-    // 86. Partition List
+    // 86. Partition List　前半部分比x小，后半部分比x大
     // ***　注意是值传递并不是引用传递
     public ListNode partition(ListNode head, int x) {
         ListNode lower = new ListNode(-1);
@@ -352,6 +355,7 @@ public class LeetCodeActivity extends AppCompatActivity {
     }
 
     // 迭代，辅助指针，先局部翻转，再移动指针
+    // *****  没看懂
     public ListNode swapPairs1(ListNode head) {
         ListNode helper = new ListNode(-1);
         helper.next = head;
@@ -390,7 +394,7 @@ public class LeetCodeActivity extends AppCompatActivity {
         return slow;
     }
 
-    //　迭代
+    //　迭代 记忆
     private ListNode reverse(ListNode head) {
         ListNode pre = head;
         ListNode cur = head.next;
@@ -404,6 +408,7 @@ public class LeetCodeActivity extends AppCompatActivity {
         }
         return pre;
     }
+
     // 递归
     private ListNode reverse1(ListNode head) {
         if (head == null || head.next == null) {
@@ -432,7 +437,7 @@ public class LeetCodeActivity extends AppCompatActivity {
     }
 
     // 147. Insertion Sort List
-    // ****
+    // **** 没看懂
     public ListNode insertionSortList(ListNode head) {
         ListNode helper = new ListNode(-1);
         ListNode newHead = helper;
@@ -454,7 +459,7 @@ public class LeetCodeActivity extends AppCompatActivity {
         
     }
 
-    // 148. Sort List
+    // 148. Sort List　无序变有序
     // *****
     public ListNode sortList(ListNode head) {
         if (head == null || head.next == null) {
@@ -619,6 +624,257 @@ public class LeetCodeActivity extends AppCompatActivity {
         return res;
     }
 
+    // 95. Unique Binary Search Trees II
+    //*****
+    public List<TreeNode> generateTrees(int n) {
+        if (n < 1) {
+            return new ArrayList();
+        }
+        return generateTrees(1, n);
+    }
+
+    public List<TreeNode> generateTrees(int start, int end) {
+        List<TreeNode> res = new ArrayList<>();
+        if (start > end) {
+            res.add(null);
+            return res;
+        }
+        for (int i = start; i <= end; i++) {
+            List<TreeNode> lefts = generateTrees(start, i - 1);
+            List<TreeNode> rights = generateTrees(i + 1, end);
+            for (TreeNode left : lefts) {
+                for (TreeNode right : rights) {
+                    TreeNode node = new TreeNode(i);
+                    node.left = left;
+                    node.right = right;
+                    res.add(node);
+                }
+            }
+        }
+        return res;
+    }
+
+    // 96. Unique Binary Search Trees
+    // *****
+    public int numTrees(int n) {
+        int[] dp = new int[n + 1];
+        dp[0] = 1;
+        for (int i = 1; i <= n; i++) {
+            for (int j = 0; j < i; j++) {
+                dp[i] += dp[j] * dp[i - j - 1];
+            }
+        }
+        return dp[n];
+    }
+
+    // 98. Validate Binary Search Tree
+    // 对每个结点保存上下界
+    // ****
+    public boolean isValidBST(TreeNode root) {
+        return isValidBST(root, Long.MIN_VALUE, Long.MAX_VALUE);
+    }
+
+    public boolean isValidBST(TreeNode root, long low, long high) {
+        if (root == null) {
+            return true;
+        }
+        if (root.val > low && root.val < high) {
+            return isValidBST(root.left, low, root.val) && isValidBST(root.right, root.val, high);
+        } else {
+            return false;
+        }
+    }
+
+    // 105. Construct Binary Tree from Preorder and Inorder Traversal
+    // ****
+    public TreeNode buildTree(int[] preorder, int[] inorder) {
+        if (preorder.length == 0) {
+            return null;
+        }
+        int index = 0;
+        for (int i = 0; i < inorder.length; i++) {
+            if (inorder[i] == preorder[0]) {
+                index = i;
+                break;
+            }
+        }
+        int[] inorderLeft = new int[index];
+        int[] inorderRight = new int[inorder.length - index - 1];
+        int[] preorderLeft = new int[index];
+        int[] preorderRight = new int[preorder.length - index - 1];
+        System.arraycopy(inorder,0, inorderLeft, 0, index);
+        System.arraycopy(inorder, index + 1, inorderRight, 0, inorder.length - index - 1);
+        System.arraycopy(preorder,1, preorderLeft, 0, index);
+        System.arraycopy(preorder, index + 1, preorderRight, 0, preorder.length - index - 1);
+        TreeNode root = new TreeNode(preorder[0]);
+        root.left = buildTree(preorderLeft, inorderLeft);
+        root.right = buildTree(preorderRight, inorderRight);
+        return root;
+    }
+
+    // 113. Path Sum II
+    // *****回溯
+    public List<List<Integer>> pathSum(TreeNode root, int sum) {
+        List<List<Integer>> res = new ArrayList<>();
+        List<Integer> tmp = new ArrayList<>();
+        pathSum(res, tmp, root, sum);
+        return res;
+    }
+
+    public void pathSum(List<List<Integer>> res, List<Integer> tmp, TreeNode root, int sum) {
+        if (root == null) {
+            return;
+        }
+        tmp.add(root.val);
+
+        if (root.left == null && root.right == null && root.val == sum) {
+            res.add(new ArrayList<Integer>(tmp));
+            // 因为和后面的条件互斥，不return也可以
+        }
+        if (root.left != null) {
+            pathSum(res, tmp, root.left, sum - root.val);
+            tmp.remove(tmp.size() - 1);
+        }
+        if (root.right != null) {
+            pathSum(res, tmp, root.right, sum - root.val);
+            tmp.remove(tmp.size() - 1);
+        }
+    }
+
+
+    public class TreeLinkNode {
+      int val;
+      TreeLinkNode left, right, next;
+      TreeLinkNode(int x) { val = x; }
+  }
+
+  // 114. Flatten Binary Tree to Linked List
+  // ****
+    public void flatten(TreeNode root) {
+        if (root == null) {
+            return;
+        }
+        if (root.left != null) {
+            flatten(root.left);
+        }
+        if (root.right != null) {
+            flatten(root.right);
+        }
+
+        TreeNode tmpRight = root.right;
+        root.right = root.left;
+        root.left = null;
+        while (root.right != null) {
+            root = root.right;
+        }
+        root.right = tmpRight;
+    }
+
+    // 116. Populating Next Right Pointers in Each Node
+    // *****
+    public void connect(TreeLinkNode root) {
+        if (root == null) {
+            return;
+        }
+
+        if (root.left != null) {
+            root.left.next = root.right;
+        }
+        if (root.right != null) {
+            if (root.next != null) {
+                root.right.next = root.next.left;
+            } else {
+                root.right.next = null;
+            }
+        }
+
+        connect(root.left);
+        connect(root.right);
+    }
+
+    // 337. House Robber III
+    // ****动态规划
+    public int rob(TreeNode root) {
+        int[] res = robHelper(root);
+        return Math.max(res[0], res[1]);
+    }
+
+    private int[] robHelper(TreeNode root) {
+        int[] dp = new int[2];
+        if (root == null) {
+            return dp;
+        }
+        int[] left = robHelper(root.left);
+        int[] right = robHelper(root.right);
+        dp[0] = root.val + left[1] + right[1];
+        dp[1] = Math.max(left[0], left[1]) + Math.max(right[0], right[1]);
+        return dp;
+    }
+
+    // 129. Sum Root to Leaf Numbers
+    // ****回溯
+    public int sumNumbers(TreeNode root) {
+        if (root == null) {
+            return 0;
+        }
+
+        List<List<TreeNode>> res = new ArrayList<>();
+        List<TreeNode> item = new ArrayList<>();
+        dfs(root, res, item);
+        int sum = 0;
+        for (List<TreeNode> treeNodes : res) {
+            StringBuilder sb = new StringBuilder();
+            for (TreeNode treeNode : treeNodes) {
+                sb.append(treeNode.val);
+            }
+            sum += Integer.valueOf(sb.toString());
+        }
+        return sum;
+    }
+
+    public void dfs(TreeNode root, List<List<TreeNode>> res, List<TreeNode> item) {
+        item.add(root);
+        if (root.left == null && root.right == null) {
+            res.add(new ArrayList<TreeNode>(item));
+        }
+        if (root.left != null) {
+            dfs(root.left, res, item);
+            item.remove(item.size() - 1);
+        }
+        if (root.right != null) {
+            dfs(root.right, res, item);
+            item.remove(item.size() - 1);
+        }
+    }
+
+    // 199. Binary Tree Right Side View
+    // ****
+    public List<Integer> rightSideView(TreeNode root) {
+        Map<Integer, Integer> map = new HashMap<>();
+        dfs(root, map, 0);
+        List<Integer> res = new ArrayList<>();
+        for (Integer item : map.values()) {
+            res.add(item);
+        }
+        return res;
+    }
+
+    public void dfs(TreeNode root, Map<Integer, Integer> map, int level) {
+        if (root == null) {
+            return;
+        }
+        level++;
+        map.put(level, root.val);
+        if (root.left != null) {
+            dfs(root.left, map, level);
+        }
+        if (root.right != null) {
+            dfs(root.right, map, level);
+        }
+    }
+
     
+
     
+
 }
