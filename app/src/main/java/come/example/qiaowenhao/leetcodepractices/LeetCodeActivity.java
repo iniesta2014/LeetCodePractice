@@ -1247,6 +1247,65 @@ public class LeetCodeActivity extends AppCompatActivity {
         }
         return false;
     }
-    
-}
 
+    // 79.Word Search
+    // 可以不使用额外的空间
+    public boolean exist(char[][] board, String word) {
+        if (board == null || board.length == 0 || board[0].length == 0 || word == null || word.length() == 0) {
+            return false;
+        }
+        int m = board.length;
+        int n = board[0].length;
+
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (exist(board, i, j, 0, word)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean exist(char[][] board, int i, int j, int cur, String word) {
+        if (cur == word.length()) {
+            return true;
+        }
+
+        if (i < 0 || i >= board.length || j < 0 || j >= board[0].length || cur >= word.length()) {
+            return false;
+        }
+        if (board[i][j] != word.charAt(cur)) {
+            return false;
+        }
+
+        // board[y][x] ^= 256 it's a marker that the letter at position x,y is a part of word we search.
+        //After board[y][x] ^= 256 the char became not a valid letter
+        board[i][j] ^= 256;
+        // 不要直接return
+        boolean exist =  exist(board, i - 1, j, cur + 1, word) || exist(board, i + 1, j, cur + 1, word)
+                || exist(board, i, j - 1, cur + 1, word) || exist(board, i, j + 1, cur + 1, word);
+        board[i][j] ^= 256;
+        return exist;
+    }
+
+
+    // 120. Triangle
+    // 自底向上，一维数组
+    public int minimumTotal(List<List<Integer>> triangle) {
+        int n = triangle.size();
+        int[] dp = new int[n];
+        for (int i = 0; i < n; i++) {
+            dp[i] = triangle.get(n - 1).get(i);
+        }
+        for (int i = n - 2; i >= 0; i --) {
+            for (int j = 0; j <= i; j++) {
+                // 理解
+                dp[j] = Math.min(dp[j], dp[j + 1]) + triangle.get(i).get(j);
+            }
+        }
+        return dp[0];
+    }
+
+
+}
