@@ -1248,6 +1248,150 @@ public class LeetCodeActivity extends AppCompatActivity {
         return false;
     }
 
+    // 238. Product of Array Except Self
+    public int[] productExceptSelf(int[] nums) {
+        int length = nums.length;
+        int[] res = new int[length];
+        int[] left = new int[length];
+        int[] right = new int[length];
+        left[0] = 1;
+        right[length - 1] = 1;
+        for (int i = 1; i < length; i++) {
+            left[i] = left[i - 1] * nums[i - 1];
+        }
+
+        for (int j = length - 2; j >= 0; j--) {
+            right[j] = right[j + 1] * nums[j + 1];
+        }
+
+        for (int k = 0; k < nums.length; k++) {
+            res[k] = left[k] * right[k];
+        }
+        return res;
+    }
+
+    // 90. Subsets II
+    public List<List<Integer>> subsetsWithDup(int[] nums) {
+        List<List<Integer>> res = new ArrayList<>();
+        Arrays.sort(nums);
+        subsetsWithDup(res, new ArrayList<Integer>(), nums, 0);
+        return res;
+    }
+
+    private void subsetsWithDup(List<List<Integer>> res, List<Integer> tmp, int[] nums, int cur) {
+        res.add(new ArrayList<Integer>(tmp));
+        for (int i = cur; i < nums.length; i++) {
+            if (i > cur && nums[i] == nums[i - 1]) {
+                continue;
+            }
+            tmp.add(nums[i]);
+            subsetsWithDup(res, tmp, nums, i + 1);
+            tmp.remove(tmp.size() - 1);
+        }
+    }
+
+    // 162. Find Peak Element
+    // **** 还有一个避免复杂边界条件判断的方法
+    public int findPeakElement(int[] nums) {
+        if (nums == null || nums.length == 0) {
+            return 0;
+        }
+        int length = nums.length;
+        int start = 0;
+        int end = length - 1;
+        int mid = 0;
+        while (start <= end) {
+            //在边界条件上非常容易出错
+            mid = (start + end) / 2;
+            if ((mid == 0 || nums[mid] > nums[mid - 1]) &&
+                    (mid + 1 == length || nums[mid] > nums[mid + 1])) {
+                return mid;
+            } else if (mid > 0 && nums[mid] < nums[mid - 1]) {
+                end = mid - 1;
+            } else {
+                start = mid + 1;
+            }
+        }
+        return mid;
+    }
+
+    //  106. Construct Binary Tree from Inorder and Postorder Traversal
+    public TreeNode buildTree1(int[] inorder, int[] postorder) {
+        return buildTree(inorder, postorder, 0, inorder.length - 1, postorder.length - 1);
+    }
+
+    // 关键在于引入postEnd和递归终止条件
+    private TreeNode buildTree(int[] inorder, int[] posterorder, int inStart, int inEnd, int postEnd) {
+        if (inStart > inEnd) {
+            return null;
+        }
+        int rootVal = posterorder[postEnd];
+        int index = inStart;
+        for (int i = index; i <= inEnd; i++) {
+            if (inorder[i] == rootVal) {
+                index = i;
+            }
+        }
+        TreeNode root = new TreeNode(rootVal);
+        root.left = buildTree(inorder, posterorder, inStart, index - 1, postEnd - 1 - (inEnd - index));
+        root.right = buildTree(inorder, posterorder, index + 1, inEnd, postEnd - 1);
+        return root;
+    }
+
+    // 64. Minimum Path Sum
+    // ***
+    public int minPathSum(int[][] grid) {
+        if (grid == null || grid.length < 0) {
+            return 0;
+        }
+        int m = grid.length;
+        int n = grid[0].length;
+        int[][] dp = new int[m][n];
+        dp[0][0] = grid[0][0];
+        for (int i = 1; i < n; i++) {
+            dp[0][i] = dp[0][i - 1] + grid[0][i];
+        }
+        // 行列不一定相等
+        for (int j = 1; j < m; j++) {
+            dp[j][0] = dp[j - 1][0] + grid[j][0];
+        }
+        for (int i = 1; i < m; i++) {
+            for (int j = 1; j < n; j++) {
+                dp[i][j] = Math.min(dp[i - 1][j], dp[i][j - 1]) + grid[i][j];
+            }
+        }
+        return dp[m - 1][n - 1];
+    }
+
+    // 216. Combination Sum III
+    // ***
+    public List<List<Integer>> combinationSum3(int k, int n) {
+        List<List<Integer>> res = new ArrayList<>();
+        if (k < 0 || n < 0) {
+            return res;
+        }
+        List<Integer> tmp = new ArrayList<>();
+        combinationSum3(res, tmp, k, n, 1);
+        return res;
+    }
+
+    private void combinationSum3(List<List<Integer>> res, List<Integer> tmp, int num, int sum, int cur) {
+        // 注意, cur是可以等于10的
+        if (num < 0 || sum < 0 || cur > 10) {
+            return;
+        }
+
+        if (sum == 0 && num == 0) {
+            res.add(new ArrayList<Integer>(tmp));
+        }
+        
+        for (int i = cur; i <= 9; i++) {
+            tmp.add(i);
+            combinationSum3(res, tmp, num - 1, sum - i, i + 1);
+            tmp.remove(tmp.size() - 1);
+        }
+    }
+
     // 79.Word Search
     // 可以不使用额外的空间
     public boolean exist(char[][] board, String word) {
