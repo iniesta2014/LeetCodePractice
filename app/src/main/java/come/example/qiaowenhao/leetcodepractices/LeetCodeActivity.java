@@ -1435,7 +1435,7 @@ public class LeetCodeActivity extends AppCompatActivity {
 
 
     // 120. Triangle
-    // 自底向上，一维数组
+    // *****自底向上，一维数组
     public int minimumTotal(List<List<Integer>> triangle) {
         int n = triangle.size();
         int[] dp = new int[n];
@@ -1451,5 +1451,160 @@ public class LeetCodeActivity extends AppCompatActivity {
         return dp[0];
     }
 
+    // 228. Summary Ranges
+    // ****双重循环,可以理解为快慢指针
+    public List<String> summaryRanges(int[] nums) {
+        List<String> res = new ArrayList<>();
+        if (nums == null || nums.length == 0) {
+            return res;
+        }
+        for (int i = 0; i < nums.length; i++) {
+            int start = nums[i];
+            while (i + 1 < nums.length && nums[i+1] - nums[i] == 1) {
+                i++;
+            }
+            if (nums[i] > start) {
+                res.add(start + "->" + nums[i]);
+            } else {
+                res.add(start + "");
+            }
+        }
+        return res;
+    }
+
+    // 153. Find Minimum in Rotated Sorted Array
+    // **** 结束条件，注意=(二分法一定要考虑只有一个或两个数这种情况)
+    public int findMin(int[] nums) {
+        if (nums == null || nums.length == 0) {
+            return -1;
+        }
+        int start = 0;
+        int end = nums.length - 1;
+        while (start < end) {
+            if (nums[start] < nums[end]) {
+                return nums[start];
+            }
+            int mid = (start + end) / 2;
+            if (nums[mid] >= nums[start]) {
+                start = mid + 1;
+            } else {
+                end = mid;
+            }
+        }
+        return nums[start];
+    }
+
+    // 229. Majority Element II
+    // ****　多数投票算法，第一次遍历确定candidate,第二次遍历判断是否满足次数要求
+    public List<Integer> majorityElement(int[] nums) {
+        List<Integer> res = new ArrayList<>();
+        if (nums == null || nums.length == 0) {
+            return res;
+        }
+        int candid1 = nums[0];
+        int candid2 = nums[0];
+        int count1 = 0;
+        int count2 = 0;
+        for (int i = 0; i < nums.length; i++) {
+            if (nums[i] == candid1) {
+                count1++;
+            } else if (nums[i] == candid2) {
+                count2++;
+            } else if (count1 == 0) {
+                candid1 = nums[i];
+                count1++;
+            } else if (count2 == 0) {
+                candid2 = nums[i];
+                count2++;
+            } else {
+                count1--;
+                count2--;
+            }
+        }
+
+        count1 = 0;
+        count2 = 0;
+        for (int i = 0; i < nums.length; i++) {
+            if (nums[i] == candid1) {
+                count1++;
+            } else if (nums[i] == candid2) {
+                count2++;
+            }
+        }
+        if (count1 > nums.length / 3) {
+            res.add(candid1);
+        }
+        if (count2 > nums.length / 3) {
+            res.add(candid2);
+        }
+        return res;
+    }
+
+    // 289. Game of Life
+    // ****　用两位二进制表示当前和下一刻的状态
+    public void gameOfLife(int[][] board) {
+        if (board == null || board.length == 0) {
+            return;
+        }
+        int row = board.length;
+        int colum = board[0].length;
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < colum; j++) {
+                int lives = getLives(board, i, j);
+                if (board[i][j] == 1) {
+                    if (lives == 2 || lives == 3) {
+                        board[i][j] = 3;
+                    }
+                }
+                if (board[i][j] == 0) {
+                    if (lives == 3) {
+                        board[i][j] = 2;
+                    }
+                }
+            }
+        }
+
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < colum; j++) {
+                board[i][j] >>= 1;
+            }
+        }
+
+    }
+
+    private int getLives(int[][] board, int i, int j) {
+        int res = 0;
+        int row = board.length;
+        int colum = board[0].length;
+        for (int l = i - 1 ; l <= i + 1; l++) {
+            if (l < 0 || l >= row - 1) {
+                continue;
+            }
+            for (int m = j - 1; m <= j + 1; m++) {
+                if (m < 0 || m >= colum - 1) {
+                    continue;
+                }
+                if (l == i && m == j) {
+                    continue;
+                }
+                if ((board[l][m] & 1) == 1) {
+                    res++;
+                }
+            }
+        }
+        return res;
+    }
+
+    // 同getLives对比一下
+    public int liveNeighbors(int[][] board, int m, int n, int i, int j) {
+        int lives = 0;
+        for (int x = Math.max(i - 1, 0); x <= Math.min(i + 1, m - 1); x++) {
+            for (int y = Math.max(j - 1, 0); y <= Math.min(j + 1, n - 1); y++) {
+                lives += board[x][y] & 1;
+            }
+        }
+        lives -= board[i][j] & 1;
+        return lives;
+    }
 
 }
