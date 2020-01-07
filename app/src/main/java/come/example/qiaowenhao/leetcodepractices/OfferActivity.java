@@ -21,6 +21,237 @@ public class OfferActivity extends AppCompatActivity {
         setContentView(R.layout.activity_offer);
     }
 
+    // 1.从尾到头打印一个链表
+    // ***
+    public ArrayList<Integer> printListFromTailToHead(ListNode listNode) {
+        if (listNode != null) {
+            printListFromTailToHead(listNode.next);
+            res.add(listNode.val);
+        }
+        return res;
+    }
+
+    // 2.链表中倒数第K个结点
+    // ***快慢指针
+    public ListNode FindKthToTail(ListNode head,int k) {
+        if (k <= 0 || head == null) {
+            return null;
+        }
+        ListNode fast = head;
+        ListNode slow = head;
+        for (int i = 1; i < k ; i++) {
+            if (fast == null) {
+                break;
+            }
+            fast = fast.next;
+        }
+        if (fast == null) {
+            return null;
+        }
+        while (fast.next != null) {
+            fast = fast.next;
+            slow = slow.next;
+        }
+        return slow;
+    }
+
+    // 3.翻转链表
+    // ****分治
+    public ListNode ReverseList(ListNode head) {
+        if (head == null || head.next == null) {
+            return head;
+        }
+        ListNode node = ReverseList(head.next);
+        head.next.next = head;
+        head.next = null;
+        return node;
+    }
+
+    // 4.合并两个排序链表
+    // *** 理解值传递
+    public ListNode Merge(ListNode list1,ListNode list2) {
+        ListNode helper = new ListNode(-1);
+        ListNode p = helper;
+        while (list1 != null && list2 != null) {
+            if (list1.val <= list2.val) {
+                p.next = list1;
+                list1 = list1.next;
+            } else {
+                p.next = list2;
+                list2 = list2.next;
+            }
+            p = p.next;
+        }
+        if (list1 != null) {
+            p.next = list1;
+        } else if (list2 != null) {
+            p.next = list2;
+        }
+        return helper.next;
+    }
+
+
+public class RandomListNode {
+    int label;
+    RandomListNode next = null;
+    RandomListNode random = null;
+
+    RandomListNode(int label) {
+        this.label = label;
+    }
+}
+
+
+    // 5.复杂链表的复制 每个节点有两个指针，一个指向下一个结点，另一个特殊指针指向任意一个结点
+    // *****
+    public RandomListNode Clone(RandomListNode pHead)
+    {
+        RandomListNode p=pHead;
+        RandomListNode t=pHead;
+        // 1在旧链表中创建新链表，不处理随机结点
+        while(p!=null){
+            RandomListNode q=new RandomListNode(p.label);
+            q.next=p.next;
+            p.next=q;
+            p=q.next;
+        }
+        // 2依据旧链表随机结点，初始化新链表随机结点
+        while(t!=null){
+            RandomListNode q=t.next;
+            if(t.random!=null) q.random=t.random.next;
+            t=q.next;
+        }
+
+        // 3拆分得到新链表
+        // 给被复制链表增加新的头结点
+        RandomListNode s=new RandomListNode(0);
+        RandomListNode s1=s;
+        while(pHead!=null){
+            RandomListNode  q=pHead.next;
+            pHead.next=q.next;
+            q.next=s.next;
+            s.next=q;
+            s=s.next;
+            pHead=pHead.next;
+        }
+        return s1.next;
+    }
+
+    // 6.二叉搜索树与双向链表
+    // 输入一颗二叉搜索树，将将其转换成一个排序的双向链表，要求不能创建任何新节点，只能调整树中结点的指向
+    // *****
+     public class TreeNode {
+     int val = 0;
+     TreeNode left = null;
+     TreeNode right = null;
+
+     public TreeNode(int val) {
+     this.val = val;
+
+     }
+
+     }
+
+     public TreeNode Convert(TreeNode pRootOfTree) {
+        if (pRootOfTree == null) {
+            return null;
+        }
+        if (pRootOfTree.left == null && pRootOfTree.right == null) {
+            return pRootOfTree;
+        }
+        TreeNode left = Convert(pRootOfTree.left);
+        TreeNode p = left;
+        while (p != null && p.right != null) {
+            p = p.right;
+        }
+        if (left != null) {
+            p.right = pRootOfTree;
+            pRootOfTree.left = p;
+        }
+        TreeNode right = Convert(pRootOfTree.right);
+        if (right != null) {
+            right.left = pRootOfTree;
+            pRootOfTree.right = right;
+        }
+        return left == null ? pRootOfTree : left;
+    }
+
+    public class ListNode {
+        int val;
+        ListNode next = null;
+
+        ListNode(int val) {
+            this.val = val;
+        }
+    }
+
+    // 7.两个链表的第一个公共结点
+    // 快指针****
+    public ListNode FindFirstCommonNode(ListNode pHead1, ListNode pHead2) {
+        int len1 = getLength(pHead1);
+        int len2 = getLength(pHead2);
+        if (len1 > len2) {
+            pHead1 = fastWalk(len1 - len2, pHead1);
+        }
+        if (len2 > len1) {
+            pHead2 = fastWalk(len2 - len1, pHead2);
+        }
+
+        while (pHead1 != null && pHead2 != null) {
+            if (pHead1.val == pHead2.val) {
+                return pHead1;
+            }
+            pHead1 = pHead1.next;
+            pHead2 = pHead2.next;
+        }
+        return null;
+    }
+
+    private int getLength(ListNode node) {
+        int length = 0;
+        while (node != null) {
+            length++;
+            node = node.next;
+        }
+        return length;
+    }
+
+    private ListNode fastWalk(int gap, ListNode node) {
+        while (gap-- > 0) {
+            node = node.next;
+        }
+        return node;
+    }
+
+
+    // 8.链表中环的入口结点
+    // ****关键在于会分析
+    public ListNode EntryNodeOfLoop(ListNode pHead)
+    {
+        if (pHead == null) {
+            return null;
+        }
+        ListNode fast = pHead;
+        ListNode slow = pHead;
+        while (fast.next != null && fast.next.next != null) {
+            fast = fast.next.next;
+            slow = slow.next;
+            if (fast == slow) {
+                break;
+            }
+        }
+        if (fast.next == null || fast.next.next == null) {
+            return null;
+        }
+        fast = pHead;
+        while (fast != slow) {
+            fast = fast.next;
+            slow = slow.next;
+        }
+        return fast;
+    }
+
+
     public ArrayList<Integer> GetLeastNumbers_Solution(int [] input, int k) {
         ArrayList<Integer> res = new ArrayList<>();
         if (input == null || input.length < k) {
@@ -175,51 +406,6 @@ public class OfferActivity extends AppCompatActivity {
         return c + 128;
     }
 
-
-    public class ListNode {
-        int val;
-        ListNode next = null;
-
-        ListNode(int val) {
-            this.val = val;
-        }
-    }
-
-    public ListNode FindFirstCommonNode(ListNode pHead1, ListNode pHead2) {
-        int len1 = getLength(pHead1);
-        int len2 = getLength(pHead2);
-        if (len1 > len2) {
-            pHead1 = fastWalk(len1 - len2, pHead1);
-        }
-        if (len2 > len1) {
-            pHead2 = fastWalk(len2 - len1, pHead2);
-        }
-
-        while (pHead1 != null && pHead2 != null) {
-            if (pHead1.val == pHead2.val) {
-                return pHead1;
-            }
-            pHead1 = pHead1.next;
-            pHead2 = pHead2.next;
-        }
-        return null;
-    }
-
-    private int getLength(ListNode node) {
-        int length = 0;
-        while (node != null) {
-            length++;
-            node = node.next;
-        }
-        return length;
-    }
-
-    private ListNode fastWalk(int gap, ListNode node) {
-        while (gap-- > 0) {
-            node = node.next;
-        }
-        return node;
-    }
 
     public void FindNumsAppearOnce(int [] array,int num1[] , int num2[]) {
         int result = 0;
@@ -436,6 +622,9 @@ public class OfferActivity extends AppCompatActivity {
         return res;
     }
 
+
+    // 扑克牌顺子,大小王为0，可以替代任意数，随机抽取5张排，判断是否是顺子
+    // ***　位运算判重
     public boolean isContinuous(int [] numbers) {
         if (numbers == null || numbers.length < 5) {
             return false;
@@ -504,18 +693,11 @@ public class OfferActivity extends AppCompatActivity {
 
     ArrayList<Integer> res = new ArrayList<>();
 
-    public ArrayList<Integer> printListFromTailToHead(ListNode listNode) {
-        if (listNode != null) {
-            printListFromTailToHead(listNode.next);
-            res.add(listNode.val);
-        }
-        return res;
-    }
+
 
     public TreeNode reConstructBinaryTree(int [] pre,int [] in) {
         return reConstruct(pre, 0, pre.length - 1, in,0, in.length - 1);
     }
-
 
     public TreeNode reConstruct(int[] pre, int preStart, int preEnd,int[] in, int inStart, int inEnd) {
         if (preStart > preEnd || inStart > inEnd) {
@@ -835,7 +1017,6 @@ public class OfferActivity extends AppCompatActivity {
         }
 
         return helper.next;
-
     }
 
     public class TreeLinkNode {
@@ -1014,4 +1195,68 @@ public class OfferActivity extends AppCompatActivity {
         return false;
 
     }
+
+    // 快速排序，分治思想，确定第一个元素的最终位置，递归的确定，该位置左侧、右侧元素的位置
+    // ****
+    // 平均最好、时间o(nlogn).最坏o(n2)空间o(nlogn) 不稳定(交换)
+    private void quickSort(int[] array, int low, int high) {
+        int key = array[low];
+        int left = low;
+        int right = high;
+        while (left < right) {
+            while (left < right && array[left] <= key) {
+                left++;
+            }
+            while (left < right && array[right] >= key) {
+                right--;
+            }
+            if (left < right) {
+                swap(array, left, right);
+            }
+        }
+        swap(array, low, left);
+        quickSort(array, low, left - 1);
+        quickSort(array, left + 1, high);
+    }
+
+    private void swap(int[] array, int i, int j) {
+        int tmp = array[i];
+        array[i] = array[j];
+        array[j] = tmp;
+    }
+
+    // 堆排序
+    // ***** 调整堆的过程
+    // 平均、最好、最坏时间o(nlogn)空间o(1) 不稳定(交换)
+    private void heapSort(int[] array) {
+        // 构建大顶堆，从第一个非叶子结点，从下到上，从右到左
+        for (int i = array.length / 2 - 1; i >= 0; i--) {
+            adjustHeap(array, i, array.length);
+        }
+
+        for (int j = array.length - 1; j > 0; j--) {
+            swap(array, 0, j);
+            adjustHeap(array, 0, j);
+        }
+    }
+
+    private void adjustHeap(int[] array, int start, int length) {
+        int tmp = array[start];
+        for (int k = 2 * start + 1; k < length; k = k * 2 + 1) {
+            if (k + 1 < length && array[k] < array[k + 1]) {
+                k++;
+            }
+
+            // 如果子节点大于父节点，将子节点值赋给父节点（不用进行交换）
+            if (array[k] > tmp) {
+                array[start] = array[k];
+                start = k;
+            } else {
+                break;
+            }
+        }
+        array[start] = tmp;
+    }
+
+
 }
