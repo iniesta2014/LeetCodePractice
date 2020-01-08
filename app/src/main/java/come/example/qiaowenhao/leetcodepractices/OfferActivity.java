@@ -13,6 +13,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
+import java.util.Stack;
 
 public class OfferActivity extends AppCompatActivity {
     @Override
@@ -21,7 +22,53 @@ public class OfferActivity extends AppCompatActivity {
         setContentView(R.layout.activity_offer);
     }
 
-    // 1.从尾到头打印一个链表
+
+    //　1.二维数组的查找 每一行都按照从左到右递增的顺序排序，每一列都按照从上到下递增的顺序排序
+    //　***　左下角开始，上面元素比他小，右面元素比他大
+    public boolean Find(int target, int [][] array) {
+        int line = array.length;
+        int row = array[0].length;
+        for (int i = line - 1, j = 0; i >= 0 && j < row;) {
+            int tmp = array[i][j];
+            if (target == tmp) {
+                return true;
+            } else if (target < tmp) {
+                i--;
+            } else {
+                j++;
+            }
+        }
+        return false;
+    }
+
+    //2.替换空格
+    // *** 从后面插入
+    public String replaceSpace(StringBuffer str) {
+        int count = 0;
+        for (int i = 0; i < str.length(); i++) {
+            if (str.charAt(i) == ' ') {
+                count++;
+            }
+        }
+
+        int oldLength = str.length();
+        int newLength = oldLength + count * 2;
+        int newIndex = newLength - 1;
+        str.setLength(newLength);
+        for (int i = oldLength - 1; i>= 0 && i < newIndex; i--) {
+            if (str.charAt(i) == ' ') {
+                str.setCharAt(newIndex--, '0');
+                str.setCharAt(newIndex--, '2');
+                str.setCharAt(newIndex--, '%');
+            } else {
+                str.setCharAt(newIndex--, str.charAt(i));
+            }
+        }
+        return str.toString();
+    }
+    
+
+    // 3.从尾到头打印一个链表
     // ***
     public ArrayList<Integer> printListFromTailToHead(ListNode listNode) {
         if (listNode != null) {
@@ -29,6 +76,27 @@ public class OfferActivity extends AppCompatActivity {
             res.add(listNode.val);
         }
         return res;
+    }
+
+    // 4.重建二叉树　已知前序中序
+    // *****
+    public TreeNode reConstructBinaryTree(int [] pre,int [] in) {
+        return reConstruct(pre, 0, pre.length - 1, in,0, in.length - 1);
+    }
+
+    public TreeNode reConstruct(int[] pre, int preStart, int preEnd,int[] in, int inStart, int inEnd) {
+        if (preStart > preEnd || inStart > inEnd) {
+            return null;
+        }
+        TreeNode root = new TreeNode(pre[preStart]);
+        for (int i = inStart; i<= inEnd; i++) {
+            if (in[i] == pre[preStart]) {
+                root.left = reConstruct(pre, preStart + 1, i - inStart + preStart, in, inStart, i - 1);
+                root.right = reConstruct(pre, i - inStart + preStart + 1, preEnd, in, i + 1, inEnd);
+                break;
+            }
+        }
+        return root;
     }
 
     // 2.链表中倒数第K个结点
@@ -90,6 +158,26 @@ public class OfferActivity extends AppCompatActivity {
         return helper.next;
     }
 
+    // 5.用两个栈实现队列
+    // 入对放到１中，出队使用2,2为空则使用将1中所有元素pop再放入
+    Stack<Integer> stack1 = new Stack<Integer>();
+    Stack<Integer> stack2 = new Stack<Integer>();
+
+    public void push(int node) {
+        stack1.push(node);
+    }
+
+    public int pop() {
+        if (stack2.isEmpty()) {
+            while (!stack1.isEmpty()) {
+                int val = stack1.pop();
+                stack2.push(val);
+            }
+        }
+        return stack2.pop();
+    }
+
+    
 
 public class RandomListNode {
     int label;
@@ -649,70 +737,8 @@ public class RandomListNode {
         return max - min < 5;
     }
 
-    public boolean Find(int target, int [][] array) {
-        int line = array.length;
-        int row = array[0].length;
-        for (int i = line - 1, j = 0; i >= 0 && j < row;) {
-            int tmp = array[i][j];
-            if (target == tmp) {
-                return true;
-            } else if (target < tmp) {
-                i--;
-                continue;
-            } else {
-                j++;
-                continue;
-            }
-        }
-        return false;
-    }
-
-    public String replaceSpace(StringBuffer str) {
-        int count = 0;
-        for (int i = 0; i < str.length(); i++) {
-            if (str.charAt(i) == ' ') {
-                count++;
-            }
-        }
-
-        int oldLength = str.length();
-        int newLength = oldLength + count * 2;
-        int newIndex = newLength - 1;
-        str.setLength(newLength);
-        for (int i = oldLength - 1; i>= 0 && i < newIndex; i--) {
-            if (str.charAt(i) == ' ') {
-                str.setCharAt(newIndex--, '0');
-                str.setCharAt(newIndex--, '2');
-                str.setCharAt(newIndex--, '%');
-            } else {
-                str.setCharAt(newIndex--, str.charAt(i));
-            }
-        }
-        return str.toString();
-    }
-
     ArrayList<Integer> res = new ArrayList<>();
 
-
-
-    public TreeNode reConstructBinaryTree(int [] pre,int [] in) {
-        return reConstruct(pre, 0, pre.length - 1, in,0, in.length - 1);
-    }
-
-    public TreeNode reConstruct(int[] pre, int preStart, int preEnd,int[] in, int inStart, int inEnd) {
-        if (preStart > preEnd || inStart > inEnd) {
-            return null;
-        }
-        TreeNode root = new TreeNode(pre[preStart]);
-        for (int i = inStart; i<= inEnd; i++) {
-            if (in[i] == pre[preStart]) {
-                root.left = reConstruct(pre, preStart + 1, i - inStart + preStart, in, inStart, i - 1);
-                root.right = reConstruct(pre, i - inStart + preStart + 1, preEnd, in, i + 1, inEnd);
-                break;
-            }
-        }
-        return root;
-    }
 
     public int minNumberInRotateArray(int [] array) {
         int low = 0, high = array.length - 1;
