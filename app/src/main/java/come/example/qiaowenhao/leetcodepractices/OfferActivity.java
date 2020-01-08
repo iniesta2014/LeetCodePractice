@@ -67,7 +67,6 @@ public class OfferActivity extends AppCompatActivity {
         return str.toString();
     }
     
-
     // 3.从尾到头打印一个链表
     // ***
     public ArrayList<Integer> printListFromTailToHead(ListNode listNode) {
@@ -99,7 +98,81 @@ public class OfferActivity extends AppCompatActivity {
         return root;
     }
 
-    // 2.链表中倒数第K个结点
+
+    // 旋转数组中的最小数字，可能存在重复元素
+    // ****
+    public int minNumberInRotateArray(int [] array) {
+        int low = 0, high = array.length - 1;
+        while (low < high) {
+            int mid = (low + high) >> 1;
+            if (array[mid] > array[high]) {
+                low = mid + 1;
+            } else if (array[mid] == array[high]) {
+                // 可能存在两边，一个一个的试
+                high = high - 1;
+            } else {
+                high = mid;
+            }
+        }
+        return array[low];
+    }
+
+    // 二进制中１的个数
+    // **** 如果一个整数不为0，那么这个整数至少有一位是1。如果我们把这个整数减1，那么原来处在整数最右边的1就会变为0
+    public int NumberOf1(int n) {
+        int count = 0;
+        while (n != 0) {
+            count++;
+            n = n & (n - 1);
+        }
+        return count;
+    }
+
+
+    // 调整数组，使所有的奇数位于所有的偶数前面，并且保证奇数和奇数偶数和偶数之间的相对位置不变
+    // ****保证稳定性的冒泡排序
+    public void reOrderArray(int [] array) {
+        boolean isSwap = false;
+        for (int i = array.length - 1; i >= 0; i--) {
+            isSwap = false;
+            for (int j = 0; j < i; j++) {
+                if (array[j] % 2 == 0 && array[j + 1] % 2 == 1) {
+                    swap(array, j, j + 1);
+                    isSwap = true;
+                }
+            }
+            if (isSwap == false) {
+                break;
+            }
+        }
+
+    }
+
+    // 数值的整数次方
+    // ****
+    public double Power(double base, int exponent) {
+        int n = exponent;
+        double res = 1;
+        if (exponent == 0) {
+            return 1;
+        } else if (exponent < 0) {
+            if (base == 0) {
+                throw new RuntimeException("分母不能为0");
+            }
+            n = -n;
+        }
+        while (n !=0) {
+            if ((n & 1) == 1) {
+                res = res * base;
+            }
+            n = n >> 1;
+            base *= base;
+        }
+
+        return exponent > 0 ? res : 1 / res;
+    }
+
+    // 链表中倒数第K个结点
     // ***快慢指针
     public ListNode FindKthToTail(ListNode head,int k) {
         if (k <= 0 || head == null) {
@@ -123,7 +196,7 @@ public class OfferActivity extends AppCompatActivity {
         return slow;
     }
 
-    // 3.翻转链表
+    // 翻转链表
     // ****分治
     public ListNode ReverseList(ListNode head) {
         if (head == null || head.next == null) {
@@ -135,7 +208,7 @@ public class OfferActivity extends AppCompatActivity {
         return node;
     }
 
-    // 4.合并两个排序链表
+    // 合并两个排序链表
     // *** 理解值传递
     public ListNode Merge(ListNode list1,ListNode list2) {
         ListNode helper = new ListNode(-1);
@@ -156,6 +229,88 @@ public class OfferActivity extends AppCompatActivity {
             p.next = list2;
         }
         return helper.next;
+    }
+
+    // 树的子结构
+    // ****
+    public boolean HasSubtree(TreeNode root1,TreeNode root2) {
+        boolean result = false;
+        if (root1 == null || root2 == null) {
+            return result;
+        }
+        if (root1.val == root2.val) {
+            result = hasSub(root1, root2);
+        } if (!result) {
+            result = HasSubtree(root1.left, root2) || HasSubtree(root1.right, root2);
+        }
+        return result;
+    }
+
+    private boolean hasSub(TreeNode node1, TreeNode node2) {
+        if (node2 == null) {
+            return true;
+        }
+        if (node1 == null) {
+            return false;
+        }
+        if (node1.val != node2.val) {
+            return false;
+        } else {
+            return hasSub(node1.left, node2.left) && hasSub(node1.right, node2.right);
+        }
+
+    }
+
+    // 二叉树的镜像
+    // ***
+    public void Mirror(TreeNode root) {
+        if (root == null) {
+            return;
+        }
+        TreeNode temp = root.left;
+        root.left = root.right;
+        root.right = temp;
+        Mirror(root.left);
+        Mirror(root.right);
+    }
+
+    // 顺时针打印矩阵
+    // *****
+    public ArrayList<Integer> printMatrix(int [][] matrix) {
+        ArrayList<Integer> list = new ArrayList<>();
+        if (matrix == null) {
+            return list;
+        }
+        int top = 0, bottom = matrix.length - 1;
+        int start = 0, end = matrix[0].length - 1;
+        // 1.是&&
+        while (start <= end && top <= bottom) {
+            for (int i = start; i <= end; i++) {
+                list.add(matrix[top][i]);
+            }
+            top++;
+            for (int i = top; i <= bottom; i++) {
+                list.add(matrix[i][end]);
+            }
+            end--;
+
+            // 2.判断越界与否
+            if (top <= bottom) {
+                for (int i = end; i >= start; i--) {
+                    list.add(matrix[bottom][i]);
+                }
+                bottom--;
+            }
+
+            if (start <= end) {
+                for (int i = bottom; i >= top; i--) {
+                    list.add(matrix[i][start]);
+                }
+                start++;
+            }
+        }
+
+        return list;
     }
 
     // 5.用两个栈实现队列
@@ -740,21 +895,6 @@ public class RandomListNode {
     ArrayList<Integer> res = new ArrayList<>();
 
 
-    public int minNumberInRotateArray(int [] array) {
-        int low = 0, high = array.length - 1;
-        while (low < high) {
-            int mid = (low + high) >> 1;
-            if (array[mid] > array[high]) {
-                low = mid + 1;
-            } else if (array[mid] == array[high]) {
-                high = high - 1;
-            } else {
-                high = mid;
-            }
-        }
-        return array[low];
-    }
-
     public int Fibonacci(int n) {
         if (n <= 1) {
             return n;
@@ -808,36 +948,6 @@ public class RandomListNode {
         return res[target];
     }
 
-    public int NumberOf1(int n) {
-        int count = 0;
-        while (n != 0) {
-            count++;
-            n = n & (n - 1);
-        }
-        return count;
-    }
-
-    public double Power(double base, int exponent) {
-        int n = exponent;
-        double res = 1;
-        if (exponent == 0) {
-            return 1;
-        } else if (exponent < 0) {
-            if (base == 0) {
-                throw new RuntimeException("分母不能为0");
-            }
-            n = -n;
-        }
-        while (n !=0) {
-            if ((n & 1) == 1) {
-                res = res * base;
-            }
-            n = n >> 1;
-            base *= base;
-        }
-
-        return exponent > 0 ? res : 1 / res;
-    }
 
     public ArrayList<String> Permutation(String str) {
         ArrayList<String> res = new ArrayList<>();

@@ -1009,7 +1009,7 @@ public class LeetCodeActivity extends AppCompatActivity {
             }
 
             if (start <= end) {
-                for (int i = bottom; i <= top; i--) {
+                for (int i = bottom; i >= top; i--) {
                     list.add(matrix[i][start]);
                 }
                 start++;
