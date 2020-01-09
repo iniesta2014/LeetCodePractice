@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Deque;
@@ -495,43 +496,6 @@ public class RandomListNode {
     }
 
 
-    public ArrayList<Integer> GetLeastNumbers_Solution(int [] input, int k) {
-        ArrayList<Integer> res = new ArrayList<>();
-        if (input == null || input.length < k) {
-            return null;
-        }
-
-        PriorityQueue<Integer> queue = new PriorityQueue<>(k, new Comparator<Integer>() {
-            @Override
-            public int compare(Integer o1, Integer o2) {
-                return o2 - o1;
-            }
-        });
-        for (int i = 0; i < input.length; i++) {
-            if (i < k) {
-                queue.offer(input[i]);
-            } else if (queue.peek() > input[i]) {
-                queue.poll();
-                queue.offer(input[i]);
-            }
-        }
-
-        while (!queue.isEmpty()) {
-            res.add(queue.poll());
-        }
-        return res;
-    }
-
-    public int NumberOf1Between1AndN_Solution(int n) {
-        int count = 0;
-        int index = 1;
-        while (n / index != 0) {
-            int a = n / index;
-            int b = n % index;
-            count += (n + 8) * index + b;
-        }
-        return count;
-    }
 
     public int GetNumberOfK(int [] array , int k) {
         if (array == null || array.length == 0) {
@@ -553,28 +517,6 @@ public class RandomListNode {
             }
         }
         return start;
-    }
-
-    public String PrintMinNumber(int [] numbers) {
-        List<Integer> list = new ArrayList<>();
-        for (int i = 0; i < numbers.length; i++) {
-            list.add(numbers[i]);
-        }
-
-        Collections.sort(list, new Comparator<Integer>() {
-            @Override
-            public int compare(Integer o1, Integer o2) {
-                String s1 = o1 + "" + o2;
-                String s2 = o2 + "" + o1;
-                return s1.compareTo(s2);
-            }
-        });
-
-        String str = "";
-        for (int i = 0; i < list.size(); i++) {
-            str += list.get(i);
-        }
-        return str;
     }
 
     public int numDecodings(String s) {
@@ -600,27 +542,6 @@ public class RandomListNode {
         return dp[n];
     }
 
-    public int GetUglyNumber_Solution(int index) {
-        if (index == 1) {
-            return 1;
-        }
-        int[] nums = new int[index + 1];
-        nums[1] = 1;
-        int id2 = 1, id3 = 1, id5 = 1;
-        for (int i = 2; i <= index; i++) {
-            nums[i] = Math.min(nums[id2] * 2, Math.min(nums[id3] * 3, nums[id5] * 5));
-            if (nums[i] == nums[id2] * 2) {
-                id2++;
-            }
-            if (nums[i] == nums[id3] * 3) {
-                id3++;
-            }
-            if (nums[i] == nums[id5] * 5) {
-                id5++;
-            }
-        }
-        return nums[index];
-    }
 
     public int FirstNotRepeatingChar(String str) {
         if (str == null) {
@@ -948,7 +869,8 @@ public class RandomListNode {
         return res[target];
     }
 
-
+    // 字符传的全排列
+    // *****
     public ArrayList<String> Permutation(String str) {
         ArrayList<String> res = new ArrayList<>();
         if (str == null) {
@@ -980,6 +902,172 @@ public class RandomListNode {
         chars[start] = chars[end];
         chars[end] = tmp;
     }
+
+    // 对比leetcode
+    public List<List<Integer>> permuteUnique(int[] nums) {
+        List<List<Integer>> list = new ArrayList<>();
+        Arrays.sort(nums);
+        backtrack(list, new ArrayList<>(), nums, new boolean[nums.length]);
+        return list;
+    }
+
+    private void backtrack(List<List<Integer>> list, List<Integer> tempList, int [] nums, boolean [] used){
+        if(tempList.size() == nums.length){
+            list.add(new ArrayList<>(tempList));
+        } else{
+            for(int i = 0; i < nums.length; i++){
+                if(used[i] || i > 0 && nums[i] == nums[i-1] && !used[i - 1]) continue;
+                used[i] = true;
+                tempList.add(nums[i]);
+                backtrack(list, tempList, nums, used);
+                used[i] = false;
+                tempList.remove(tempList.size() - 1);
+            }
+        }
+    }
+
+    // 数组中出现次数超过一半的数字　多数投票算法
+    public int MoreThanHalfNum_Solution(int [] array) {
+        if (array == null || array.length == 0) {
+            return 0;
+        }
+        int res = array[0];
+        int count = 1;
+        for (int i = 1; i < array.length; i++) {
+            if (array[i] == res) {
+                count++;
+            } else {
+                count--;
+            }
+            if (count == 0) {
+                res = array[i];
+                count = 1;
+            }
+        }
+        count = 0;
+        for (int i = 0; i < array.length; i++) {
+            if (array[i] == res) {
+                count++;
+            }
+        }
+        return count > array.length / 2 ? res : 0;
+    }
+
+    // 最小的K个数
+    // ****最小堆
+    public ArrayList<Integer> GetLeastNumbers_Solution(int [] input, int k) {
+        ArrayList<Integer> res = new ArrayList<>();
+        if (input == null || input.length < k || k < 1) {
+            return res;
+        }
+
+        PriorityQueue<Integer> queue = new PriorityQueue<>(k, new Comparator<Integer>() {
+            @Override
+            public int compare(Integer o1, Integer o2) {
+                return o2 - o1;
+            }
+        });
+        for (int i = 0; i < input.length; i++) {
+            if (i < k) {
+                queue.offer(input[i]);
+            } else if (queue.peek() > input[i]) {
+                queue.poll();
+                queue.offer(input[i]);
+            }
+        }
+
+        while (!queue.isEmpty()) {
+            res.add(queue.poll());
+        }
+        return res;
+    }
+
+    // 连续子数组的最大和
+    // ****关键dp的定义
+    public int FindGreatestSumOfSubArray(int[] array) {
+        if (array == null || array.length == 0) {
+            return 0;
+        }
+        int[] dp = new int[array.length];
+        dp[0] = array[0];
+        int res = dp[0];
+        for (int i = 1; i < array.length; i++) {
+            if (dp[i-1] > 0) {
+                dp[i] = dp[i-1] + array[i];
+            } else {
+                dp[i] = array[i];
+            }
+            res = Math.max(dp[i], res);
+        }
+        return res;
+    }
+
+    // 整数中1出现的次数(从1到n整数中出现的次数)
+    // *****
+    public int NumberOf1Between1AndN_Solution(int n) {
+        int count = 0;
+        int index = 1;
+        while (n / index != 0) {
+            int a = n / index;
+            int b = n % index;
+            count += (n + 8) * index + b;
+        }
+        return count;
+    }
+
+
+    // 把数组排成最小的数
+    // ****
+    public String PrintMinNumber(int [] numbers) {
+        List<Integer> list = new ArrayList<>();
+        for (int i = 0; i < numbers.length; i++) {
+            list.add(numbers[i]);
+        }
+
+        Collections.sort(list, new Comparator<Integer>() {
+            @Override
+            public int compare(Integer o1, Integer o2) {
+                String s1 = o1 + "" + o2;
+                String s2 = o2 + "" + o1;
+                // 升序排列
+                return s1.compareTo(s2);
+            }
+        });
+
+        String str = "";
+        for (int i = 0; i < list.size(); i++) {
+            str += list.get(i);
+        }
+        return str;
+    }
+
+    // 第n个丑数
+    // ****
+    public int GetUglyNumber_Solution(int index) {
+        if (index == 0) {
+            return 0;
+        }
+        if (index == 1) {
+            return 1;
+        }
+        int[] nums = new int[index + 1];
+        nums[1] = 1;
+        int id2 = 1, id3 = 1, id5 = 1;
+        for (int i = 2; i <= index; i++) {
+            nums[i] = Math.min(nums[id2] * 2, Math.min(nums[id3] * 3, nums[id5] * 5));
+            if (nums[i] == nums[id2] * 2) {
+                id2++;
+            }
+            if (nums[i] == nums[id3] * 3) {
+                id3++;
+            }
+            if (nums[i] == nums[id5] * 5) {
+                id5++;
+            }
+        }
+        return nums[index];
+    }
+
 
     public int Sum_Solution(int n) {
         int sum = n;
@@ -1394,5 +1482,110 @@ public class RandomListNode {
         array[start] = tmp;
     }
 
+    // 栈的压入、弹出序列，判断第二个序列是可能为第一个序列的弹出序列，假设所有入栈的数字都不相等
+    // ****数据结构的使用
+    public boolean IsPopOrder(int [] pushA,int [] popA) {
+        if(pushA.length == 0 || popA.length == 0)
+            return false;
+        Stack<Integer> s = new Stack<Integer>();
+        //用于标识弹出序列的位置
+        int popIndex = 0;
+        for(int i = 0; i< pushA.length;i++){
+            s.push(pushA[i]);
+            //如果栈不为空，且栈顶元素等于弹出序列
+            while(!s.empty() &&s.peek() == popA[popIndex]){
+                //出栈
+                s.pop();
+                //弹出序列向后一位
+                popIndex++;
+            }
+        }
+        return s.empty();
+    }
 
+    //　从上往下打印二叉树
+    // ***队列（LinkedList）的使用
+    public ArrayList<Integer> PrintFromTopToBottom(TreeNode root) {
+        Deque<TreeNode> treeNodes = new LinkedList();
+        ArrayList<Integer> res = new ArrayList();
+        if (root != null) {
+            treeNodes.add(root);
+        }
+        while(!treeNodes.isEmpty()) {
+            TreeNode treeNode = treeNodes.pop();
+            if (treeNode.left != null) {
+                treeNodes.offer(treeNode.left);
+            }
+            if (treeNode.right != null) {
+                treeNodes.offer(treeNode.right);
+            }
+            res.add(treeNode.val);
+        }
+        return res;
+    }
+
+    // 二叉搜索树的后序遍历序列 输入一个整数数组，判断该数组是不是某二茬搜索树后序遍历的结果
+    // ****
+    public boolean VerifySquenceOfBST(int [] sequence) {
+        if (sequence == null || sequence.length == 0) {
+            return false;
+        }
+        return verify(sequence, 0, sequence.length - 1);
+    }
+
+    private boolean verify(int[] sequence, int start, int end) {
+        if (start >= end) {
+            return true;
+        }
+        int root = sequence[end];
+        int i = start;
+        for (; i < end; i++) {
+            if (sequence[i] > root) {
+                break;
+            }
+        }
+        int j = i;
+        for (; j < end; j++) {
+            if (sequence[j] < root) {
+                return false;
+            }
+        }
+        return verify(sequence, 0, i - 1) && verify(sequence, i, end - 1);
+    }
+
+    // 二叉树中和为某一值的路径（从树的根节点开始往下一直到叶结点形成的一条路径）
+    // ****回溯
+    public ArrayList<ArrayList<Integer>> FindPath(TreeNode root,int target) {
+        ArrayList<ArrayList<Integer>> res = new ArrayList();
+        ArrayList<Integer> temp = new ArrayList();
+        if (root == null) {
+            return res;
+        }
+        findPath(res, temp, root, target, 0);
+        return res;
+    }
+
+    private void findPath(ArrayList<ArrayList<Integer>> res, ArrayList<Integer> temp, TreeNode root, int target, int sum) {
+        if (root == null) {
+            return;
+        }
+        temp.add(root.val);
+        sum+=root.val;
+        if (root.left == null && root.right == null) {
+            if (sum == target) {
+                res.add(new ArrayList<Integer>(temp));
+                temp.remove(temp.size() - 1);
+            }
+            return;
+        }
+        findPath(res, temp, root.left, target, sum);
+        temp.remove(temp.size() - 1);
+        findPath(res, temp, root.right, target, sum);
+    }
+
+
+
+    
+
+    
 }
