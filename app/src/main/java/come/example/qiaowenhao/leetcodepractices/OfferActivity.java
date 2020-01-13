@@ -496,29 +496,6 @@ public class RandomListNode {
     }
 
 
-
-    public int GetNumberOfK(int [] array , int k) {
-        if (array == null || array.length == 0) {
-            return 0;
-        }
-        return binarySearch(array, k + 0.5) - binarySearch(array, k - 0.5);
-
-    }
-
-    private int binarySearch(int[] array, double target) {
-        int start = 0;
-        int end = array.length - 1;
-        while (start <= end) {
-            int mid = (start + end) / 2;
-            if (target > array[mid]) {
-                start = mid + 1;
-            } else if (target < array[mid]) {
-                end = mid - 1;
-            }
-        }
-        return start;
-    }
-
     public int numDecodings(String s) {
         if (s == null || s.length() == 0) {
             return 0;
@@ -542,7 +519,8 @@ public class RandomListNode {
         return dp[n];
     }
 
-
+    // 第一个只出现一次的字符
+    // ****
     public int FirstNotRepeatingChar(String str) {
         if (str == null) {
             return -1;
@@ -570,6 +548,55 @@ public class RandomListNode {
         return c + 128;
     }
 
+
+    // 数组的逆序对，在数组中的两个数字，如果前面一个数字大于后面的数字，则这两个数字组成一个逆序对
+    // *****
+    private int count;
+    public int InversePairs(int [] array) {
+        if (array == null || array.length == 0) {
+            return 0;
+        }
+        inverseParis(array, 0, array.length - 1);
+        return count;
+    }
+
+    private void inverseParis(int[] array, int start, int end) {
+        int mid = (start + end) >> 1;
+        if (start >= end) {
+            return;
+        }
+        inverseParis(array, start , mid);
+        inverseParis(array, mid + 1, end);
+        merge(array, start, end, mid);
+    }
+
+    private void merge(int[] array, int start, int end, int mid) {
+        int i = start;
+        int j = mid + 1;
+        int[] temp = new int[end - start + 1];
+        int k = 0;
+        while (i <= mid && j<= end) {
+            if (array[i] <= array[j]) {
+                temp[k++] = array[i++];
+            } else {
+                temp[k++] = array[j++];
+                count += mid - i + 1;
+                count %= 1000000007;
+            }
+        }
+        while (i <= mid) {
+            temp[k++] = array[i++];
+        }
+        while (j <= end) {
+            temp[k++] = array[j++];
+        }
+        for (k = 0; k < temp.length; k++) {
+            array[start + k] = temp[k];
+        }
+    }
+
+    //　数字在排序数组中出现的次数
+    // ****
 
     public void FindNumsAppearOnce(int [] array,int num1[] , int num2[]) {
         int result = 0;
@@ -600,60 +627,6 @@ public class RandomListNode {
         return ((num >> index) & 1) == 1;
     }
 
-    public ArrayList<Integer> FindNumbersWithSum(int [] array,int sum) {
-        ArrayList<Integer> res = new ArrayList<Integer>();
-        if (array == null || array.length == 0) {
-            return res;
-        }
-        int start = 0;
-        int end = array.length;
-        while (start < end) {
-            if (array[start] + array[end] < sum) {
-                start++;
-            } else if (array[start] + array[end] > sum) {
-                end--;
-            } else {
-                res.add(array[start]);
-                res.add(array[end]);
-                break;
-            }
-        }
-        return res;
-    }
-
-    public ArrayList<ArrayList<Integer> > FindContinuousSequence(int sum) {
-        ArrayList<ArrayList<Integer>> res = new ArrayList<>();
-        int start = 1, end = 2;
-        while (start < end) {
-            int total = (start + end) * (end - start + 1) / 2;
-            if (total == sum) {
-                ArrayList<Integer> temp = new ArrayList<>();
-                for (int i = start; i <= end; i++) {
-                    temp.add(i);
-                }
-                res.add(temp);
-                start++;
-            } else if (total < sum) {
-                end++;
-            } else {
-                start++;
-            }
-        }
-        return res;
-    }
-
-
-    public class TreeNode {
-        int val = 0;
-        TreeNode left = null;
-        TreeNode right = null;
-
-        public TreeNode(int val) {
-            this.val = val;
-
-        }
-
-    }
 
     int index = 0;
     TreeNode KthNode(TreeNode pRoot, int k)
@@ -722,48 +695,6 @@ public class RandomListNode {
         return Math.abs(left - right) > 1 ? -1 : Math.max(left, right) + 1;
     }
 
-    public String ReverseSentence(String str) {
-        char[] chars = str.toCharArray();
-        int length = chars.length;
-        reverse(chars, 0, length - 1);
-        int i = 0, start = 0, end = 0;
-        while (i < length) {
-            while (i < length && chars[i] == ' ') {
-                i++;
-            }
-            start = end = i;
-            while (i < length && chars[i] != ' ') {
-                end++;
-                i++;
-            }
-            reverse(chars, start, end - 1);
-        }
-        return String.valueOf(chars);
-    }
-
-    private void reverse(char[] chars, int start, int end) {
-        while (start < end) {
-            char tmp = chars[start];
-            chars[start] = chars[end];
-            chars[end] = tmp;
-            start++;
-            end--;
-        }
-    }
-
-    public String LeftRotateString(String str,int n) {
-        if (n == 0 || str == null || str.length() == 0) {
-            return str;
-        }
-
-        char[] chars = str.toCharArray();
-        int length = chars.length;
-        n = n % length;
-        reverse(chars, 0, n - 1);
-        reverse(chars, n, length - 1);
-        reverse(chars, 0, length - 1);
-        return String.valueOf(chars);
-    }
 
     public ArrayList<Integer> maxInWindows(int [] num, int size) {
         ArrayList<Integer> res = new ArrayList<>();
@@ -1068,23 +999,6 @@ public class RandomListNode {
         return nums[index];
     }
 
-
-    public int Sum_Solution(int n) {
-        int sum = n;
-        boolean hasResult = (n > 0) && ((sum += Sum_Solution(n - 1)) > 0);
-        return sum;
-    }
-
-    public int Add(int num1,int num2) {
-        int sum = num1 ^ num2;
-        int add = (num1 & num2) << 1;
-        while (add != 0) {
-            sum = sum ^ add;
-            add = (sum & add) << 1;
-        }
-        return sum;
-    }
-
     public int StrToInt(String str) {
         int length = str.length();
         char[] chars = str.toCharArray();
@@ -1116,22 +1030,6 @@ public class RandomListNode {
             res += value;
         }
         return res;
-    }
-
-    public boolean duplicate(int numbers[],int length,int [] duplication) {
-        if (numbers == null || length == 0) {
-            return false;
-        }
-        boolean[] dups = new boolean[length];
-        for (int i = 0; i < length; i++) {
-            if (dups[numbers[i]] == false) {
-                dups[numbers[i]] = true;
-            } else {
-                duplication[0] = numbers[i];
-                return true;
-            }
-        }
-        return false;
     }
 
     public int[] multiply(int[] A) {
@@ -1583,9 +1481,228 @@ public class RandomListNode {
         findPath(res, temp, root.right, target, sum);
     }
 
+    // 数字在排序数组中出现的次数
+    // ****
+    public int GetNumberOfK(int [] array , int k) {
+        int length = array.length;
+        if(length == 0){
+            return 0;
+        }
+        int firstK = getFirstK(array, k, 0, length-1);
+        int lastK = getLastK(array, k, 0, length-1);
+        if(firstK != -1 && lastK != -1){
+            return lastK - firstK + 1;
+        }
+        return 0;
+    }
 
+    //递归写法
+    private int getFirstK(int [] array , int k, int start, int end){
+        if(start > end){
+            return -1;
+        }
+        int mid = (start + end) >> 1;
+        if(array[mid] > k){
+            return getFirstK(array, k, start, mid-1);
+        }else if (array[mid] < k){
+            return getFirstK(array, k, mid+1, end);
+        }else if(mid-1 >=0 && array[mid-1] == k){
+            return getFirstK(array, k, start, mid-1);
+        }else{
+            return mid;
+        }
+    }
 
-    
+    //循环写法
+    private int getLastK(int [] array , int k, int start, int end){
+        int length = array.length;
+        int mid = (start + end) >> 1;
+        while(start <= end){
+            if(array[mid] > k){
+                end = mid-1;
+            }else if(array[mid] < k){
+                start = mid+1;
+            }else if(mid+1 < length && array[mid+1] == k){
+                start = mid+1;
+            }else{
+                return mid;
+            }
+            mid = (start + end) >> 1;
+        }
+        return -1;
+    }
 
-    
+    //和为s的连续正数序列　比如和为100的序列18,19,20,21,22
+    // ****
+    public ArrayList<ArrayList<Integer> > FindContinuousSequence(int sum) {
+        ArrayList<ArrayList<Integer>> res = new ArrayList<>();
+        int start = 1, end = 2;
+        while (start < end) {
+            int total = (start + end) * (end - start + 1) / 2;
+            if (total == sum) {
+                ArrayList<Integer> temp = new ArrayList<>();
+                for (int i = start; i <= end; i++) {
+                    temp.add(i);
+                }
+                res.add(temp);
+                start++;
+            } else if (total < sum) {
+                end++;
+            } else {
+                start++;
+            }
+        }
+        return res;
+    }
+
+    // 和为s的两个数字 递增序列，在数组中查找两个数，使得他们的和正好是s,输出两个数的乘积最小的
+    // ****
+    public ArrayList<Integer> FindNumbersWithSum(int [] array,int sum) {
+        ArrayList<Integer> res = new ArrayList<Integer>();
+        if (array == null || array.length == 0) {
+            return res;
+        }
+        int start = 0;
+        int end = array.length - 1;
+        while (start < end) {
+            if (array[start] + array[end] < sum) {
+                start++;
+            } else if (array[start] + array[end] > sum) {
+                end--;
+            } else {
+                res.add(array[start]);
+                res.add(array[end]);
+                break;
+            }
+        }
+        return res;
+    }
+
+    // 左旋转字符串　循环左移K位输出
+    // ****
+    public String LeftRotateString(String str,int n) {
+        if (n == 0 || str == null || str.length() == 0) {
+            return str;
+        }
+
+        char[] chars = str.toCharArray();
+        int length = chars.length;
+        n = n % length;
+        reverse1(chars, 0, n - 1);
+        reverse1(chars, n, length - 1);
+        reverse1(chars, 0, length - 1);
+        return String.valueOf(chars);
+    }
+
+    private void reverse1(char[] chars, int start, int end) {
+        while (start < end) {
+            char tmp = chars[start];
+            chars[start] = chars[end];
+            chars[end] = tmp;
+            start++;
+            end--;
+        }
+    }
+
+    // 翻转单词顺序
+    // 
+    public String ReverseSentence(String str) {
+        char[] chars = str.toCharArray();
+        int length = chars.length;
+        reverse1(chars, 0, length - 1);
+        int i = 0, start = 0, end = 0;
+        while (i < length) {
+            while (i < length && chars[i] == ' ') {
+                i++;
+            }
+            start = end = i;
+            while (i < length && chars[i] != ' ') {
+                end++;
+                i++;
+            }
+            reverse1(chars, start, end - 1);
+        }
+        return String.valueOf(chars);
+    }
+
+    // 约瑟夫环  关键在于分析
+    // *****
+    public int LastRemaining_Solution(int n, int m) {
+        if (n == 0 || m== 0)
+            return - 1;
+        if (n == 1)
+            return 0;
+        return (LastRemaining_Solution(n-1, m) + m) % n;
+    }
+
+    // 求1+2+3+...+n,要求不使用乘除法\for/while/if else/ switch等关键字和条件判断语句
+    // ****利用短路&&
+    public int Sum_Solution(int n) {
+        int sum = n;
+        boolean hasResult = (n > 0) && ((sum += Sum_Solution(n - 1)) > 0);
+        return sum;
+    }
+
+    //不用加减乘除做加法
+    // ****
+    public int Add(int num1,int num2) {
+        while (num2!=0) {
+            int temp = num1^num2;
+            num2 = (num1&num2)<<1;
+            num1 = temp;
+        }
+        return num1;
+    }
+
+    // 把字符串转换成整数,输入一个字符串，包括数字字母符号，如果是合法的数值表达式则返回该数字，否则返回0
+    // ***** 关键是越界问题的判断,注意越界的返回值问题，现在是越界统一返回最值，但是如果越界返回0,这么写有问题
+    public int myAtoi(String str) {
+        if (str == null || str.length() == 0) {
+            return 0;
+        }
+        int i = 0;
+        int sign = 1;
+        int res = 0;
+        int length = str.length();
+        while (i < length && str.charAt(i) == ' ') {
+            i++;
+        }
+
+        if (i < length && (str.charAt(i) == '-' || str.charAt(i) == '+')) {
+            if (str.charAt(i) == '-') {
+                sign = -1;
+            }
+            i++;
+        }
+
+        while (i < length) {
+            int temp = str.charAt(i++) - '0';
+            if (temp > 9 || temp < 0) {
+                break;
+            }
+            if (res > Integer.MAX_VALUE / 10 || res == Integer.MAX_VALUE / 10 && temp > Integer.MAX_VALUE % 10) {
+                return sign == 1 ? Integer.MAX_VALUE : Integer.MIN_VALUE;
+            }
+            res = 10 * res + temp;
+        }
+        return res * sign;
+    }
+
+    // 数组中重复的数字
+    // *** 长度为n的数组里所有数字都在0到n-1之间，找出数组中任意一个重复数字
+    public boolean duplicate(int numbers[],int length,int [] duplication) {
+        if (numbers == null || length == 0) {
+            return false;
+        }
+        boolean[] dups = new boolean[length];
+        for (int i = 0; i < length; i++) {
+            if (dups[numbers[i]] == false) {
+                dups[numbers[i]] = true;
+            } else {
+                duplication[0] = numbers[i];
+                return true;
+            }
+        }
+        return false;
+    }
 }
