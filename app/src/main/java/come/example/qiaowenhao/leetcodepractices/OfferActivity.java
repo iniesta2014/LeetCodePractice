@@ -999,58 +999,6 @@ public class RandomListNode {
         return nums[index];
     }
 
-    public int StrToInt(String str) {
-        int length = str.length();
-        char[] chars = str.toCharArray();
-        int i = 0;
-        int res = 0;
-        int sign = 1;
-        while (i < length && chars[i] ==' ') {
-            i++;
-        }
-        if (i < length && (chars[i] == '-' || chars[i] == '+')) {
-            sign = chars[i] == '-' ? -1 : 1;
-            i++;
-        }
-        for (; i < length; i++) {
-            int value = chars[i] - '0';
-            if (value < 0 || value > 9) {
-                res = 0;
-                break;
-            }
-            value = value * sign;
-            if (sign == 1 && (res > Integer.MAX_VALUE / 10 || (res == Integer.MAX_VALUE / 10 && value > Integer.MAX_VALUE % 10))) {
-                return 0;
-            }
-
-            if (sign == -1 && (res < Integer.MIN_VALUE / 10 || (res == Integer.MIN_VALUE / 10 && Math.abs(value) > Integer.MAX_VALUE % 10 + 1))) {
-                return 0;
-            }
-            res = res * 10;
-            res += value;
-        }
-        return res;
-    }
-
-    public int[] multiply(int[] A) {
-        int length = A.length;
-        int[] left = new int[length];
-        int[] res = new int[length];
-        left[0] = 1;
-        for (int i = 1; i < length; i++) {
-            left[i] = left[i - 1] * A[i - 1];
-        }
-        int[] right = new int[length];
-        right[length - 1] = 1;
-        for (int i = length - 2; i >=0; i--) {
-            right[i] = right[i+1] * A[i+1];
-        }
-        for (int i = 0; i < length; i++) {
-            res[i] = left[i] * right[i];
-        }
-        return res;
-    }
-
     public boolean isNumeric(char[] str) {
         int length = str.length;
         boolean hasDot = false;
@@ -1625,15 +1573,32 @@ public class RandomListNode {
         return String.valueOf(chars);
     }
 
-    // 约瑟夫环  关键在于分析
+    // (圆圈中最后剩下的数字)约瑟夫环
+    // 解法一　递归关键在于分析
     // *****
     public int LastRemaining_Solution(int n, int m) {
-        if (n == 0 || m== 0)
+        if (n == 0 || m == 0)
             return - 1;
         if (n == 1)
             return 0;
         return (LastRemaining_Solution(n-1, m) + m) % n;
     }
+
+    //解法二　用链表模拟
+    // 第一次删掉的位置是从0开始数m-1个位置，以后每次从删掉的下一个节点开始取，所以每次要在bt的索引处加上m-1，因为是环，所以加了以后对链表长度取余
+    public int LastRemaining_Solution1(int n, int m) {
+        LinkedList<Integer> list = new LinkedList<>();
+        for (int i = 0; i < n; i++) {
+            list.add(i);
+        }
+        int tmp = 0;
+        while (list.size() > 1) {
+            tmp = (tmp + m - 1) % list.size();
+            list.remove(tmp);
+        }
+        return list.size() == 1 ? list.get(0) : -1;
+    }
+
 
     // 求1+2+3+...+n,要求不使用乘除法\for/while/if else/ switch等关键字和条件判断语句
     // ****利用短路&&
@@ -1688,6 +1653,40 @@ public class RandomListNode {
         return res * sign;
     }
 
+    //*****　将字符串转换成整数，合法的表达式返回该数字，否则返回0 和上面这个解法不同
+    public int StrToInt(String str) {
+        int length = str.length();
+        char[] chars = str.toCharArray();
+        int i = 0;
+        int res = 0;
+        int sign = 1;
+        while (i < length && chars[i] ==' ') {
+            i++;
+        }
+        if (i < length && (chars[i] == '-' || chars[i] == '+')) {
+            sign = chars[i] == '-' ? -1 : 1;
+            i++;
+        }
+        for (; i < length; i++) {
+            int value = chars[i] - '0';
+            if (value < 0 || value > 9) {
+                res = 0;
+                break;
+            }
+            value = value * sign;
+            if (sign == 1 && (res > Integer.MAX_VALUE / 10 || (res == Integer.MAX_VALUE / 10 && value > Integer.MAX_VALUE % 10))) {
+                return 0;
+            }
+
+            if (sign == -1 && (res < Integer.MIN_VALUE / 10 || (res == Integer.MIN_VALUE / 10 && Math.abs(value) > Integer.MAX_VALUE % 10 + 1))) {
+                return 0;
+            }
+            res = res * 10;
+            res += value;
+        }
+        return res;
+    }
+
     // 数组中重复的数字
     // *** 长度为n的数组里所有数字都在0到n-1之间，找出数组中任意一个重复数字
     public boolean duplicate(int numbers[],int length,int [] duplication) {
@@ -1704,5 +1703,26 @@ public class RandomListNode {
             }
         }
         return false;
+    }
+
+    // 构建乘积数组
+    // ***
+    public int[] multiply(int[] A) {
+        int length = A.length;
+        int[] left = new int[length];
+        int[] res = new int[length];
+        left[0] = 1;
+        for (int i = 1; i < length; i++) {
+            left[i] = left[i - 1] * A[i - 1];
+        }
+        int[] right = new int[length];
+        right[length - 1] = 1;
+        for (int i = length - 2; i >=0; i--) {
+            right[i] = right[i+1] * A[i+1];
+        }
+        for (int i = 0; i < length; i++) {
+            res[i] = left[i] * right[i];
+        }
+        return res;
     }
 }
